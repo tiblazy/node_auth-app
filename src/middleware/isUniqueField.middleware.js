@@ -1,4 +1,4 @@
-import error from '../errors/index.error.js';
+import errors from '../errors/index.error.js';
 
 const isUniqueFieldMiddleware = (model) => async (req, _, next) => {
   const uniqueFields = Object.keys(model.rawAttributes).filter(
@@ -16,9 +16,7 @@ const isUniqueFieldMiddleware = (model) => async (req, _, next) => {
       });
 
       if (existingRecord) {
-        const err = error.badRequest(`The ${f} value is already taken`);
-
-        return next(err);
+        return next(errors.badRequest(`The ${f} value is already taken`));
       }
     }
   }

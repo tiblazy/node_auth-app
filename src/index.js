@@ -3,16 +3,18 @@
 import 'dotenv/config';
 import express from 'express';
 import 'express-async-errors';
-import config from './configs/index.config.js';
+import configs from './configs/index.config.js';
+import authRouter from './routers/auth.router.js';
 import userRouter from './routers/user.router.js';
 import './sync.js';
 
 const app = express();
 
 app.use(express.json());
-app.use(config.cors);
+app.use(configs.cors);
 app.use('/users', userRouter);
-app.use(config.asyncError);
+app.use('/auth', authRouter);
+app.use(configs.asyncError);
 
 app.listen(process.env.EXPRESS_PORT, () => {
   // eslint-disable-next-line no-console

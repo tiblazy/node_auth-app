@@ -19,18 +19,23 @@ const send = async (args) => {
   return mail;
 };
 
-const sendActivationEmail = ({ to, token }) => {
+const sendActivationEmail = async ({ to, token }) => {
   const href = `${process.env.CLIENT_HOST}/activate/${token}`;
   const html = `
   <h1>Activate account</h1>
   <a href="${href}">${href}</a>
   `;
 
-  return send({
+  await send({
     to,
     subject: 'Activate your account',
     text: html,
   });
+
+  return {
+    token,
+    send,
+  };
 };
 
 const mailService = {

@@ -8,11 +8,23 @@ const create = async (req, res) => {
     token: uuidv4(),
   });
 
-  res.status(201).send({ user, mail });
+  await services.auth.create({
+    userId: user.id,
+    activate: mail.token,
+  });
+
+  res.status(201).send(user);
+};
+
+const find = async (req, res) => {
+  const user = await services.user.find(req.params);
+
+  res.send(user);
 };
 
 const userController = {
   create,
+  find,
 };
 
 export default userController;

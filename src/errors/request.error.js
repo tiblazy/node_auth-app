@@ -1,4 +1,4 @@
-const badRequest = (status, message) => {
+const create = (status, message) => {
   const err = new Error(message);
 
   err.status = status;
@@ -6,4 +6,7 @@ const badRequest = (status, message) => {
   return err;
 };
 
-export { badRequest };
+const badRequest = (message) => create(400, message);
+const notFound = (message) => create(404, message);
+
+export { badRequest, notFound };
