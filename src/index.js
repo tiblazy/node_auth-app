@@ -3,16 +3,18 @@
 import 'dotenv/config';
 import express from 'express';
 import 'express-async-errors';
-import asyncError from './configs/asyncError.config.js';
-import cors from './configs/cors.config.js';
+import config from './configs/index.config.js';
+import userRouter from './routers/user.router.js';
+import './sync.js';
 
-const app = express;
+const app = express();
 
 app.use(express.json());
-app.use(cors);
-app.use(asyncError);
+app.use(config.cors);
+app.use('/users', userRouter);
+app.use(config.asyncError);
 
-app.liste(process.env.EXPRESS_PORT, () => {
+app.listen(process.env.EXPRESS_PORT, () => {
   // eslint-disable-next-line no-console
   console.log('Server running');
 });
