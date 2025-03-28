@@ -1,29 +1,32 @@
-import models from '../models/index.model.js';
 import errors from '../errors/index.error.js';
+import models from '../models/index.model.js';
+import encryptService from './encrypt.service.js';
+import jwtService from './jwt.service.js';
 
-const create = async (data) => {
-  await models.token.create({
-    userId: data.userId,
-    activate: data.activate,
-  });
-};
+const login = async (data) => {
+  const user = await models.user.findOne({ where: { email: data.email } });
 
-const activate = async (data) => {
-  const token = await models.token.findOne({ where: { activate: data.token } });
-
-  if (!token) {
-    throw errors.notFound('Token not found');
+  if (!user) {
+    throw errors.badRequest('Invalid credentials');
   }
 
-  await models.token.update(
-    { activate: null },
-    { where: { activate: data.token } },
-  );
+  const validPassword = encryptService.compare(data.password, user.password);
+
+  if (!validPassword) {
+    throw errors.badRequest('Invalid credentials');
+  }
+
+  const token = jwtService.sign({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  });
+
+  return token;
 };
 
 const authService = {
-  create,
-  activate,
+  login,
 };
 
 export default authService;

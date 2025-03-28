@@ -1,12 +1,14 @@
 import services from '../services/index.service.js';
 
-const activate = async (req, res) => {
-  await services.auth.activate(req.params);
-  res.send({ info: 'Account activated with success' });
+const login = async (req, res) => {
+  const token = await services.auth.login(req.body);
+
+  res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000 });
+  res.send({ token });
 };
 
 const authController = {
-  activate,
+  login,
 };
 
 export default authController;

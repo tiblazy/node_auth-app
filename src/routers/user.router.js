@@ -13,6 +13,12 @@ userRouter
     middlewares.isUniqueField(models.user),
     controllers.user.create,
   )
-  .get('/:id', middlewares.accessStatus.user, controllers.user.find);
+  .get(
+    '/:id',
+    middlewares.auth,
+    middlewares.access.user,
+    middlewares.access.role,
+    controllers.user.find,
+  );
 
 export default userRouter;

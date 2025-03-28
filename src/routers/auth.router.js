@@ -4,10 +4,6 @@ import middlewares from '../middleware/index.middleware.js';
 
 const authRouter = Router();
 
-authRouter.get(
-  '/:token',
-  middlewares.accessStatus.token('activate', 'params'),
-  controllers.auth.activate,
-);
+authRouter.post('/login', middlewares.access.user, controllers.auth.login);
 
 export default authRouter;

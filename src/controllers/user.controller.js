@@ -3,12 +3,17 @@ import services from '../services/index.service.js';
 
 const create = async (req, res) => {
   const user = await services.user.create(req.body);
+
+  if (!user) {
+    throw new Error('Erro na criação do usuário');
+  }
+
   const mail = await services.mail.sendActivationEmail({
     to: user.email,
     token: uuidv4(),
   });
 
-  await services.auth.create({
+  await services.token.create({
     userId: user.id,
     activate: mail.token,
   });

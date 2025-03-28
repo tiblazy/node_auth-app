@@ -1,14 +1,14 @@
-import { hashSync } from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import errors from '../errors/index.error.js';
 import models from '../models/index.model.js';
 import utils from '../utils/index.utils.js';
+import encryptService from './encrypt.service.js';
 
 const CONFIDENTIAL_FIELDS = ['password', 'createdAt', 'updatedAt'];
 const normalizeData = (data) => utils.normalize(data, CONFIDENTIAL_FIELDS);
 
 const create = async (data) => {
-  const password = hashSync(data.password, 8);
+  const password = encryptService.sync(data.password);
   const user = await models.user.create({ id: uuidv4(), ...data, password });
 
   return normalizeData(user.dataValues);
