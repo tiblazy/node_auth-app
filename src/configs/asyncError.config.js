@@ -7,7 +7,9 @@ const asyncError = (err, _, res, __) => {
   }
 
   if (err instanceof Error) {
-    return res.status(err.status).send({
+    const status = err.status || 500;
+
+    return res.status(status).send({
       issue: err.message,
     });
   }

@@ -3,6 +3,7 @@ import errors from '../errors/index.error.js';
 import models from '../models/index.model.js';
 import utils from '../utils/index.utils.js';
 import encryptService from './encrypt.service.js';
+import services from './index.service.js';
 
 const CONFIDENTIAL_FIELDS = ['password', 'createdAt', 'updatedAt'];
 const normalizeData = (data) => utils.normalize(data, CONFIDENTIAL_FIELDS);
@@ -25,9 +26,53 @@ const find = async (data) => {
   return user;
 };
 
+const list = async () => {
+  const users = await models.user.findAll();
+  const normalizedUsers = users.map((user) => normalizeData(user.dataValues));
+
+  return { users: normalizedUsers };
+};
+
+const update = async (id, data) => {
+  if (data.id) {
+    delete data.id;
+  }
+
+  await models.user.update(data, { where: { id } });
+
+  return normalizeData((await find({ id })).dataValues);
+};
+
+const updatePassword = async (id, data) => {
+  const user = await find({ id });
+  const isOldPassword = services.encrypt.compare(
+    data.oldPassword,
+    user.password,
+  );
+
+  if (!isOldPassword) {
+    throw errors.badRequest('Old password is not correct');
+  }
+
+  const password = services.encrypt.sync(data.newPassword);
+
+  await models.user.update({ password }, { where: { id } });
+
+  return normalizeData((await find({ id })).dataValues);
+};
+
+const remove = async (id) => {
+  await models.auth.destroy({ where: { userId: id } });
+  await models.user.destroy({ where: { id } });
+};
+
 const userService = {
   create,
   find,
+  list,
+  update,
+  updatePassword,
+  remove,
 };
 
 export default userService;
