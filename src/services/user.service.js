@@ -22,7 +22,7 @@ const find = async (data) => {
     throw errors.notFound('User not found');
   }
 
-  return normalizeData(user.dataValues);
+  return user;
 };
 
 const userService = {

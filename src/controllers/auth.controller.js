@@ -1,14 +1,53 @@
+import errors from '../errors/index.error.js';
+import models from '../models/index.model.js';
 import services from '../services/index.service.js';
+import normalize from '../utils/normalize.utils.js';
 
 const login = async (req, res) => {
-  const token = await services.auth.login(req.body);
+  const user = await services.auth.login(req.body);
 
-  res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 3600000 });
-  res.send({ token });
+  generateTokens(res, user);
+};
+
+const refresh = async (req, res) => {
+  const refreshToken = req.cookies;
+
+  const user = services.jwt.refreshVerify(refreshToken);
+
+  if (!user) {
+    throw errors.unauthorized();
+  }
+
+  generateTokens(res, user);
+};
+
+const generateTokens = async (res, user) => {
+  const normalizeUser = normalize(user.dataValues, [
+    'password',
+    'createdAt',
+    'updatedAt',
+  ]);
+
+  const accessToken = services.jwt.sign(normalizeUser);
+  const refreshToken = services.jwt.refreshSign(normalizeUser);
+
+  await models.token.update(
+    { token: accessToken, refresh: refreshToken },
+    { where: { userId: user.id } },
+  );
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 12 * 60 * 60 * 1000,
+  });
+
+  res.send({ user: normalizeUser, accessToken });
 };
 
 const authController = {
   login,
+  refresh,
 };
 
 export default authController;

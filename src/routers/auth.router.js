@@ -4,6 +4,8 @@ import middlewares from '../middleware/index.middleware.js';
 
 const authRouter = Router();
 
-authRouter.post('/login', middlewares.access.user, controllers.auth.login);
+authRouter
+  .post('/login', middlewares.access.user, controllers.auth.login)
+  .get('/refresh', middlewares.access.user, controllers.auth.refresh);
 
 export default authRouter;

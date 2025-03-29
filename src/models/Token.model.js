@@ -15,11 +15,11 @@ const Token = configs.sequelize.define(
       allowNull: true,
     },
     token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     refresh: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     userId: {
