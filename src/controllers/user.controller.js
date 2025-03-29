@@ -13,7 +13,7 @@ const create = async (req, res) => {
     token: uuidv4(),
   });
 
-  await services.token.create({
+  await services.auth.create({
     userId: user.id,
     activate: mail.token,
   });

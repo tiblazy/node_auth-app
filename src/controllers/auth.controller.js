@@ -31,7 +31,7 @@ const generateTokens = async (res, user) => {
   const accessToken = services.jwt.sign(normalizeUser);
   const refreshToken = services.jwt.refreshSign(normalizeUser);
 
-  await models.token.update(
+  await models.auth.update(
     { token: accessToken, refresh: refreshToken },
     { where: { userId: user.id } },
   );
@@ -45,8 +45,14 @@ const generateTokens = async (res, user) => {
   res.send({ user: normalizeUser, accessToken });
 };
 
+const activate = async (req, res) => {
+  await services.auth.activate(req.params);
+  res.send({ info: 'Account activated with success' });
+};
+
 const authController = {
   login,
+  activate,
   refresh,
 };
 

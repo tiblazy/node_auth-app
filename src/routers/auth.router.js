@@ -5,6 +5,11 @@ import middlewares from '../middleware/index.middleware.js';
 const authRouter = Router();
 
 authRouter
+  .get(
+    '/activate/:token',
+    middlewares.access.token('activate', 'params'),
+    controllers.auth.activate,
+  )
   .post('/login', middlewares.access.user, controllers.auth.login)
   .get('/refresh', middlewares.access.user, controllers.auth.refresh);
 

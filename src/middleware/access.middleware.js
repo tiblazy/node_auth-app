@@ -5,7 +5,7 @@ import services from '../services/index.service.js';
 const userMiddleware = async (req, _, next) => {
   const query = req.body.email ? { email: req.body.email } : req.params;
   const user = await services.user.find(query);
-  const token = await models.token.findOne({ where: { userId: user.id } });
+  const token = await models.auth.findOne({ where: { userId: user.id } });
 
   if (token.activate) {
     return next(
@@ -21,7 +21,7 @@ const userMiddleware = async (req, _, next) => {
 const tokenMiddleware = (key, property) => async (req, _, next) => {
   const [, value] = Object.entries(req[property])[0];
 
-  const token = await models.token.findOne({
+  const token = await models.auth.findOne({
     where: { [key]: value },
   });
 

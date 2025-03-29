@@ -18,7 +18,29 @@ const login = async (data) => {
   return user;
 };
 
+const create = async (data) => {
+  await models.auth.create({
+    userId: data.userId,
+    activate: data.activate,
+  });
+};
+
+const activate = async (data) => {
+  const token = await models.auth.findOne({ where: { activate: data.token } });
+
+  if (!token) {
+    throw errors.notFound('Token not found');
+  }
+
+  await models.auth.update(
+    { activate: null },
+    { where: { activate: data.token } },
+  );
+};
+
 const authService = {
+  create,
+  activate,
   login,
 };
 

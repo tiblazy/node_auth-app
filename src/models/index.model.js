@@ -1,16 +1,16 @@
 import configs from '../configs/index.config.js';
-import Token from './Token.model.js';
+import Auth from './Auth.model.js';
 import User from './User.model.js';
 
-User.hasMany(Token, { foreignKey: 'userId' });
-Token.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Auth, { foreignKey: 'userId' });
+Auth.belongsTo(User, { foreignKey: 'userId' });
 
 configs.sequelize.model.User = User;
-configs.sequelize.model.Token = Token;
+configs.sequelize.model.Auth = Auth;
 
 const models = {
   user: User,
-  token: Token,
+  auth: Auth,
 };
 
 export default models;

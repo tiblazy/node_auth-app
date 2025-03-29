@@ -1,8 +1,8 @@
 import { DataTypes } from 'sequelize';
 import configs from '../configs/index.config.js';
 
-const Token = configs.sequelize.define(
-  'Token',
+const Auth = configs.sequelize.define(
+  'Auth',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -32,8 +32,8 @@ const Token = configs.sequelize.define(
     },
   },
   {
-    tableName: 'tokens',
+    tableName: 'auths',
   },
 );
 
-export default Token;
+export default Auth;
