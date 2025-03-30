@@ -26,11 +26,31 @@ const find = async (data) => {
   return user;
 };
 
-const list = async () => {
-  const users = await models.user.findAll();
+const list = async (data) => {
+  const totalUsers = await models.user.count();
+  const { limit, offset, pages, prev, curr, next } = utils.pagination(
+    data,
+    totalUsers,
+  );
+
+  const users = await models.user.findAll({
+    limit,
+    offset,
+    order: [['createdAt']],
+  });
   const normalizedUsers = users.map((user) => normalizeData(user.dataValues));
 
-  return { users: normalizedUsers };
+  const listUsers = {
+    size: totalUsers,
+    pages,
+    prev,
+    curr,
+    next,
+
+    users: normalizedUsers,
+  };
+
+  return listUsers;
 };
 
 const updateInfo = async (id, data) => {
@@ -61,6 +81,10 @@ const updateInfo = async (id, data) => {
 
   if (data.password) {
     delete data.password;
+  }
+
+  if (!data.email && !data.name) {
+    throw errors.badRequest('Provide a new email or name');
   }
 
   const user = await models.user.update(data, { where: { id } });

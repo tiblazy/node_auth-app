@@ -23,6 +23,10 @@ const logout = async (token) => {
     where: token,
   });
 
+  if (!auth) {
+    return;
+  }
+
   await models.auth.update(
     {
       token: null,

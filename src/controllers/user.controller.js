@@ -29,7 +29,7 @@ const find = async (req, res) => {
 };
 
 const list = async (req, res) => {
-  const users = await services.user.list();
+  const users = await services.user.list(req.query);
 
   res.send(users);
 };
