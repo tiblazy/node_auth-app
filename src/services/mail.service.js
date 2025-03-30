@@ -20,7 +20,7 @@ const send = async (args) => {
 };
 
 const sendActivationEmail = async ({ to, token }) => {
-  const href = `${process.env.CLIENT_HOST}/token/activate/${token}`;
+  const href = `${process.env.CLIENT_HOST}/auth/activate/${token}`;
   const html = `
   <h1>Activate account</h1>
   <a href="${href}">${href}</a>

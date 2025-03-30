@@ -18,6 +18,20 @@ const login = async (data) => {
   return user;
 };
 
+const logout = async (token) => {
+  const auth = await models.auth.findOne({
+    where: token,
+  });
+
+  await models.auth.update(
+    {
+      token: null,
+      refresh: null,
+    },
+    { where: { id: auth.id } },
+  );
+};
+
 const create = async (data) => {
   await models.auth.create({
     userId: data.userId,
@@ -42,6 +56,7 @@ const authService = {
   create,
   activate,
   login,
+  logout,
 };
 
 export default authService;

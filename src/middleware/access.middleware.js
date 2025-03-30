@@ -3,8 +3,7 @@ import models from '../models/index.model.js';
 import services from '../services/index.service.js';
 
 const userMiddleware = async (req, _, next) => {
-  const query = req.body.email ? { email: req.body.email } : req.params;
-  const user = await services.user.find(query);
+  const user = await services.user.find({ email: req.body.email });
   const token = await models.auth.findOne({ where: { userId: user.id } });
 
   if (token.activate) {
@@ -32,7 +31,7 @@ const tokenMiddleware = (key, property) => async (req, _, next) => {
   next();
 };
 
-const roleMiddleware = (req, _, next) => {
+const ownerMiddleware = async (req, _, next) => {
   if (req.user.id !== req.params.id) {
     return next(
       errors.forbidden('You do not have permission to access this resource'),
@@ -45,7 +44,7 @@ const roleMiddleware = (req, _, next) => {
 const accessMiddleware = {
   user: userMiddleware,
   token: (key, propery) => tokenMiddleware(key, propery),
-  role: roleMiddleware,
+  owner: ownerMiddleware,
 };
 
 export default accessMiddleware;

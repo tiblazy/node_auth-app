@@ -11,6 +11,7 @@ authRouter
     controllers.auth.activate,
   )
   .post('/login', middlewares.access.user, controllers.auth.login)
+  .post('/logout', controllers.auth.logout)
   .get('/refresh', middlewares.access.user, controllers.auth.refresh);
 
 export default authRouter;

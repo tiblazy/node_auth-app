@@ -7,41 +7,32 @@ import userSchema from '../validations/user.validation.js';
 const userRouter = Router();
 
 userRouter
+  .route('/')
   .post(
-    '/',
     middlewares.validationField(userSchema.create),
     middlewares.isUniqueField(models.user),
     controllers.user.create,
   )
-  .get('/', controllers.user.list)
-  .get(
-    '/:id',
-    middlewares.auth,
-    middlewares.access.user,
-    middlewares.access.role,
-    controllers.user.find,
-  )
+  .get(middlewares.auth, controllers.user.list);
+
+userRouter
+  .route('/:id')
+  .get(middlewares.auth, middlewares.access.owner, controllers.user.find)
   .patch(
-    '/:id/info',
     middlewares.auth,
     middlewares.validationField(userSchema.updateInfo),
-    // middlewares.access.user, middlewares.access.role
+    middlewares.access.owner,
     controllers.user.updateInfo,
   )
+  .delete(middlewares.auth, middlewares.access.owner, controllers.user.remove);
+
+userRouter
+  .route('/:id/password')
   .patch(
-    '/:id/password',
     middlewares.auth,
     middlewares.validationField(userSchema.updatePassword),
-    // middlewares.access.user,
-    // middlewares.access.role,
+    middlewares.access.owner,
     controllers.user.updatePassword,
-  )
-  .delete(
-    '/:id',
-    middlewares.auth,
-    middlewares.access.user,
-    middlewares.access.role,
-    controllers.user.remove,
   );
 
 export default userRouter;

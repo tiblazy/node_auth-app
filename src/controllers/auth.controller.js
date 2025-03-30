@@ -9,6 +9,16 @@ const login = async (req, res) => {
   generateTokens(res, user);
 };
 
+const logout = async (req, res) => {
+  const token = { refresh: req.cookies.refreshToken } || {
+    token: req.headers.authorization?.split(' ')[1],
+  };
+
+  await services.auth.logout(token);
+
+  res.status(204).send();
+};
+
 const refresh = async (req, res) => {
   const refreshToken = req.cookies;
 
@@ -52,6 +62,7 @@ const activate = async (req, res) => {
 
 const authController = {
   login,
+  logout,
   activate,
   refresh,
 };
