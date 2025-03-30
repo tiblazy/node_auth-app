@@ -1,5 +1,5 @@
-const validationFieldMiddleware = (schema) => async (req, res, next) => {
-  await schema.parse(req.body);
+const validationFieldMiddleware = (schema) => async (req, _, next) => {
+  await schema(req).parse(req.body);
   next();
 };
 

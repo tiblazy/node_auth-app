@@ -6,8 +6,14 @@ const asyncError = (err, _, res, __) => {
     return error.zod(err, res);
   }
 
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    return res.status(400).send({
+      issue: ` ${err.message}`,
+    });
+  }
+
   if (err instanceof Error) {
-    const status = err.status || 500;
+    const status = err.status;
 
     return res.status(status).send({
       issue: err.message,

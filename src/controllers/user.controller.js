@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import services from '../services/index.service.js';
+import utils from '../utils/index.utils.js';
 
 const create = async (req, res) => {
   const user = await services.user.create(req.body);
@@ -24,7 +25,7 @@ const create = async (req, res) => {
 const find = async (req, res) => {
   const user = await services.user.find(req.params);
 
-  res.send(user);
+  res.send(utils.normalize(user.dataValues, utils.CONFIDENTIAL_FIELDS));
 };
 
 const list = async (req, res) => {
@@ -33,14 +34,29 @@ const list = async (req, res) => {
   res.send(users);
 };
 
-const update = async (req, res) => {
-  const user = await services.user.update(req.user.id, req.body);
+const updateInfo = async (req, res) => {
+  await services.user.updateInfo(req.user.id, req.body);
 
-  res.send(user);
+  const user = await services.user.find({ id: req.user.id });
+  const oldEmail = req.user.email;
+  const newEmail = req.body.email;
+
+  if (newEmail) {
+    await services.mail.send({
+      to: [oldEmail, newEmail],
+      subject: 'Email change',
+      text: `Hi. ${req.user.name} your ${oldEmail} is now ${newEmail}`,
+    });
+  }
+  req.user = user.toJSON();
+
+  res.send(utils.normalize(user.dataValues, utils.CONFIDENTIAL_FIELDS));
 };
 
 const updatePassword = async (req, res) => {
   const user = await services.user.updatePassword(req.user.id, req.body);
+
+  req.user = await services.user.find({ id: req.user.id });
 
   res.send(user);
 };
@@ -55,7 +71,7 @@ const userController = {
   create,
   find,
   list,
-  update,
+  updateInfo,
   updatePassword,
   remove,
 };

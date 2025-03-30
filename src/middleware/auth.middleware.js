@@ -1,7 +1,7 @@
 import errors from '../errors/index.error.js';
 import services from '../services/index.service.js';
 
-const authMiddleware = (req, _, next) => {
+const authMiddleware = async (req, _, next) => {
   const token =
     req.cookies.refreshToken || req.headers.authorization?.split(' ')[1];
 
@@ -10,6 +10,14 @@ const authMiddleware = (req, _, next) => {
   }
 
   req.user = services.jwt.refreshVerify(token);
+
+  const user = await services.user.find({ id: req.user.id });
+
+  if (!user) {
+    return next(errors.notFound('User not found'));
+  }
+
+  req.user = user.toJSON();
 
   next();
 };

@@ -22,11 +22,11 @@ userRouter
     controllers.user.find,
   )
   .patch(
-    '/:id',
+    '/:id/info',
     middlewares.auth,
-    // middlewares.access.user, ver como contornar logica
-    middlewares.access.role,
-    controllers.user.update,
+    middlewares.validationField(userSchema.updateInfo),
+    // middlewares.access.user, middlewares.access.role
+    controllers.user.updateInfo,
   )
   .patch(
     '/:id/password',

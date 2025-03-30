@@ -5,8 +5,8 @@ import utils from '../utils/index.utils.js';
 import encryptService from './encrypt.service.js';
 import services from './index.service.js';
 
-const CONFIDENTIAL_FIELDS = ['password', 'createdAt', 'updatedAt'];
-const normalizeData = (data) => utils.normalize(data, CONFIDENTIAL_FIELDS);
+const normalizeData = (data) =>
+  utils.normalize(data, utils.CONFIDENTIAL_FIELDS);
 
 const create = async (data) => {
   const password = encryptService.sync(data.password);
@@ -33,14 +33,39 @@ const list = async () => {
   return { users: normalizedUsers };
 };
 
-const update = async (id, data) => {
+const updateInfo = async (id, data) => {
   if (data.id) {
     delete data.id;
   }
 
-  await models.user.update(data, { where: { id } });
+  if (data.email) {
+    const updateEmail = await find({ id });
 
-  return normalizeData((await find({ id })).dataValues);
+    if (!data.password) {
+      throw errors.badRequest(
+        'Needed to send current password to update email',
+      );
+    }
+
+    const userPassword = services.encrypt.compare(
+      data.password,
+      updateEmail.dataValues.password,
+    );
+
+    if (!userPassword) {
+      throw errors.badRequest(
+        'Can not update email current password does not match',
+      );
+    }
+  }
+
+  if (data.password) {
+    delete data.password;
+  }
+
+  const user = await models.user.update(data, { where: { id } });
+
+  return user;
 };
 
 const updatePassword = async (id, data) => {
@@ -70,7 +95,7 @@ const userService = {
   create,
   find,
   list,
-  update,
+  updateInfo,
   updatePassword,
   remove,
 };
